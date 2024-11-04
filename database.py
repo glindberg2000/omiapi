@@ -1,9 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-import os
+from dotenv import load_dotenv
 
-# Use the DATABASE_URL from environment variables or a default value
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://omi_user:securepassword123@localhost:5433/omi_data")
+# Load environment variables from .env file
+load_dotenv()
+
+# Use the DATABASE_URL from environment variables
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)

@@ -12,4 +12,5 @@ __pycache__/
 .pylint.d/
 .venv/
 env/
+venv/
 omiv/
