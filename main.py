@@ -6,7 +6,8 @@ from pydantic_models import Memory
 import logging
 from typing import Optional
 from datetime import datetime
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
+from fastapi.staticfiles import StaticFiles
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -14,7 +15,17 @@ logger = logging.getLogger(__name__)
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="Memory Management API",
+    description="API for managing and retrieving memory data.",
+    version="1.0.0",
+    servers=[
+        {"url": "https://omi.ella-ai-care.com/", "description": "Production server"}
+    ]
+)
+
+# Mount the static files directory
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Dependency to get DB session
 def get_db():
@@ -67,22 +78,22 @@ async def handle_realtime_transcript(request: Request):
 @app.get("/memories/")
 def get_memories(
     user_id: str = Query(..., description="User ID to filter memories"),
-    start_date: Optional[datetime] = Query(None, description="Start date for filtering memories"),
-    end_date: Optional[datetime] = Query(None, description="End date for filtering memories"),
+    limit: Optional[int] = Query(1, description="Limit the number of memories returned"),
     include_transcripts: bool = Query(False, description="Whether to include full transcripts"),
     db: Session = Depends(get_db)
 ):
     try:
         query = db.query(MemoryDB).filter(MemoryDB.user_id == user_id)
 
-        # Filter by date range if provided
-        if start_date and end_date:
-            query = query.filter(and_(MemoryDB.created_at >= start_date, MemoryDB.created_at <= end_date))
+        # Sort memories by creation date in descending order to get the latest first
+        query = query.order_by(desc(MemoryDB.created_at))
 
-        # Retrieve memories
+        # Limit the number of memories returned
+        query = query.limit(limit)
+
         memories = query.all()
 
-        # Format the response
+        # Prepare the response based on the include_transcripts flag
         response = []
         for memory in memories:
             memory_data = {

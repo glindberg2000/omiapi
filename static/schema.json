@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "structured": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "overview": { "type": "string" },
+        "emoji": { "type": "string" },
+        "category": { "type": "string" },
+        "actionItems": { "type": "array" },
+        "events": { "type": "array" }
+      },
+      "required": ["title", "overview", "emoji", "category"]
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "transcript_segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "speaker": { "type": "string" },
+          "speaker_id": { "type": "integer" },
+          "is_user": { "type": "boolean" },
+          "start": { "type": "number" },
+          "end": { "type": "number" }
+        },
+        "required": ["text", "speaker", "speaker_id", "is_user", "start", "end"]
+      }
+    },
+    "plugins_results": { "type": "array" },
+    "geolocation": { "type": ["object", "null"] },
+    "photos": { "type": "array" },
+    "discarded": { "type": "boolean" },
+    "deleted": { "type": "boolean" },
+    "source": { "type": "string" },
+    "language": { "type": "string" },
+    "external_data": { "type": ["object", "null"] },
+    "status": { "type": "string" }
+  },
+  "required": ["id", "created_at", "structured", "started_at", "finished_at", "transcript_segments", "discarded", "deleted", "source", "language", "status"]
+} 

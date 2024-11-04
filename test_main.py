@@ -5,6 +5,7 @@ import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import MemoryDB
+from datetime import datetime
 
 @pytest.fixture(scope="function")
 def setup_db():
@@ -14,6 +15,30 @@ def setup_db():
         # Wipe existing records for the test user
         user_id = "Dza7UFHfokPLlpCf7q15PI228aI3"
         db.query(MemoryDB).filter(MemoryDB.user_id == user_id).delete()
+        db.commit()
+
+        # Insert a test memory
+        test_memory = MemoryDB(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            created_at=datetime.utcnow(),
+            started_at=datetime.utcnow(),
+            finished_at=datetime.utcnow(),
+            source="test-source",
+            language="en",
+            structured={"title": "Test Memory", "overview": "Test overview", "emoji": "🧠", "category": "test", "actionItems": [], "events": []},
+            transcript_segments=[],
+            geolocation=None,
+            photos=[],
+            plugins_results=[],
+            external_data=None,
+            discarded=False,
+            deleted=False,
+            visibility="private",
+            processing_memory_id=None,
+            status="completed"
+        )
+        db.add(test_memory)
         db.commit()
         yield
     finally:
@@ -72,5 +97,17 @@ async def test_memory_created(setup_db):
         assert response.status_code == 200
         assert response.json() == {"status": "success", "memory_id": unique_id}
 
-        # Optionally, verify the memory was stored correctly
-        # This would involve querying the database directly to check the record
+@pytest.mark.asyncio
+async def test_retrieve_memories(setup_db):
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        user_id = "Dza7UFHfokPLlpCf7q15PI228aI3"  # Example user ID
+
+        # Send a GET request to the /memories/ endpoint
+        response = await ac.get(f"/memories/?user_id={user_id}")
+
+        # Assert the response status code and content
+        assert response.status_code == 200
+        memories = response.json()
+        assert len(memories) > 0  # Ensure at least one memory is returned
+        assert memories[0]["structured"]["title"] == "Test Memory"
