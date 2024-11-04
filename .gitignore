@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+.vscode/
+.idea/
+*.db
+*.sqlite3
+*.log
+.pytest_cache/
+.mypy_cache/
+.pylint.d/
+.venv/
+env/
+omiv/
