@@ -1,47 +1,124 @@
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "id": { "type": "string" },
-    "created_at": { "type": "string", "format": "date-time" },
-    "structured": {
-      "type": "object",
-      "properties": {
-        "title": { "type": "string" },
-        "overview": { "type": "string" },
-        "emoji": { "type": "string" },
-        "category": { "type": "string" },
-        "actionItems": { "type": "array" },
-        "events": { "type": "array" }
-      },
-      "required": ["title", "overview", "emoji", "category"]
-    },
-    "started_at": { "type": "string", "format": "date-time" },
-    "finished_at": { "type": "string", "format": "date-time" },
-    "transcript_segments": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "text": { "type": "string" },
-          "speaker": { "type": "string" },
-          "speaker_id": { "type": "integer" },
-          "is_user": { "type": "boolean" },
-          "start": { "type": "number" },
-          "end": { "type": "number" }
-        },
-        "required": ["text", "speaker", "speaker_id", "is_user", "start", "end"]
-      }
-    },
-    "plugins_results": { "type": "array" },
-    "geolocation": { "type": ["object", "null"] },
-    "photos": { "type": "array" },
-    "discarded": { "type": "boolean" },
-    "deleted": { "type": "boolean" },
-    "source": { "type": "string" },
-    "language": { "type": "string" },
-    "external_data": { "type": ["object", "null"] },
-    "status": { "type": "string" }
-  },
-  "required": ["id", "created_at", "structured", "started_at", "finished_at", "transcript_segments", "discarded", "deleted", "source", "language", "status"]
-} 
+openapi: 3.1.0
+info:
+  title: Memory Management API
+  description: API for managing and retrieving memory data.
+  version: v1.0.0
+servers:
+  - url: https://omi.ella-ai-care.com
+    description: Production server
+paths:
+  /memories:
+    get:
+      operationId: getMemories
+      summary: Retrieve memories
+      description: Fetch a list of memories for a specific user.
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          description: The ID of the user whose memories are to be retrieved.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Limit the number of memories returned.
+          schema:
+            type: integer
+        - name: include_transcripts
+          in: query
+          required: false
+          description: Whether to include full transcripts.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A list of memories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+components:
+  schemas:
+    Memory:
+      type: object
+      properties:
+        id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        structured:
+          type: object
+          properties:
+            title:
+              type: string
+            overview:
+              type: string
+            emoji:
+              type: string
+            category:
+              type: string
+            actionItems:
+              type: array
+              items:
+                type: string
+            events:
+              type: array
+              items:
+                type: string
+          required: [title, overview, emoji, category]
+        started_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+        transcript_segments:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              speaker:
+                type: string
+              speaker_id:
+                type: integer
+              is_user:
+                type: boolean
+              start:
+                type: number
+              end:
+                type: number
+            required: [text, speaker, speaker_id, is_user, start, end]
+        plugins_results:
+          type: array
+          items:
+            type: object
+        geolocation:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+        photos:
+          type: array
+          items:
+            type: string
+        discarded:
+          type: boolean
+        deleted:
+          type: boolean
+        source:
+          type: string
+        language:
+          type: string
+        external_data:
+          type: object
+        status:
+          type: string
+      required: [id, created_at, structured, started_at, finished_at, transcript_segments, discarded, deleted, source, language, status] 

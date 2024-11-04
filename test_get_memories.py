@@ -92,4 +92,4 @@ async def test_get_memory_with_transcripts(setup_db):
         assert response.status_code == 200
         memories = response.json()
         assert len(memories) == 1  # Default to returning only the latest memory
-        assert "transcript_segments" in memories[0]  # Include transcripts when requested 
+        assert "transcript_segments" in memories[0]  # Include transcripts when requested

@@ -1,36 +1,35 @@
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-from datetime import datetime
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict
 
 class TranscriptSegment(BaseModel):
-    text: str
-    speaker: str
-    speaker_id: int
-    is_user: bool
-    start: float
-    end: float
+    text: Optional[str] = None
+    speaker: Optional[str] = None
+    speaker_id: Optional[int] = None
+    is_user: Optional[bool] = None
+    start: Optional[float] = None
+    end: Optional[float] = None
 
 class StructuredData(BaseModel):
-    title: str
-    overview: str
-    emoji: str
-    category: str
-    actionItems: List[Any]
-    events: List[Any]
+    title: Optional[str] = None
+    overview: Optional[str] = None
+    emoji: Optional[str] = None
+    category: Optional[str] = None
+    actionItems: Optional[List[str]] = Field(default_factory=list)
+    events: Optional[List[str]] = Field(default_factory=list)
 
 class Memory(BaseModel):
-    id: str
-    created_at: datetime
-    structured: StructuredData
-    started_at: datetime
-    finished_at: datetime
-    transcript_segments: List[TranscriptSegment]
-    plugins_results: List[Any]
-    geolocation: Optional[Dict[str, Any]] = None
-    photos: List[str]
-    discarded: bool
-    deleted: bool
-    source: str
-    language: str
-    external_data: Optional[Dict[str, Any]] = None
-    status: str
+    id: Optional[str] = None
+    created_at: Optional[str] = None
+    structured: Optional[StructuredData] = None
+    started_at: Optional[str] = None
+    finished_at: Optional[str] = None
+    transcript_segments: Optional[List[TranscriptSegment]] = Field(default_factory=list)
+    plugins_results: Optional[List[Dict]] = Field(default_factory=list)
+    geolocation: Optional[Dict] = None
+    photos: Optional[List[str]] = Field(default_factory=list)
+    discarded: Optional[bool] = None
+    deleted: Optional[bool] = None
+    source: Optional[str] = None
+    language: Optional[str] = None
+    external_data: Optional[Dict] = None
+    status: Optional[str] = None
