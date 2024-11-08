@@ -10,6 +10,7 @@ from sqlalchemy import and_, desc
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 import numpy as np
+from uuid import UUID
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -175,4 +176,36 @@ async def search_memories(
         ]
     except Exception as e:
         logger.error(f"Error in semantic search: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/memories/{memory_id}")
+async def get_memory_detail(
+    memory_id: UUID,
+    user_id: str = Query(..., description="User ID to verify ownership"),
+    db: Session = Depends(get_db)
+):
+    try:
+        memory = db.query(MemoryDB).filter(
+            and_(
+                MemoryDB.id == memory_id,
+                MemoryDB.user_id == user_id
+            )
+        ).first()
+        
+        if not memory:
+            raise HTTPException(status_code=404, detail="Memory not found")
+            
+        return {
+            "id": memory.id,
+            "created_at": memory.created_at,
+            "structured": memory.structured,
+            "transcript_segments": memory.transcript_segments,
+            "plugins_results": memory.plugins_results,
+            "external_data": memory.external_data,
+            "geolocation": memory.geolocation,
+            "photos": memory.photos,
+            "status": memory.status
+        }
+    except Exception as e:
+        logger.error(f"Error processing /memories/{memory_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
